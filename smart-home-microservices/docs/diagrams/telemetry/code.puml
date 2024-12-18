@@ -1,0 +1,71 @@
+@startuml
+
+package "telemetry" {
+    interface TelemetryConsumer {
+      + {abstract}  sub(topoc) (TelemetryEntity, error)
+    }
+    
+    class TelemetryConsumerImp implements TelemetryConsumer {
+      + sub(topoc) (TelemetryEntity, error)
+    }
+    
+    interface TemperatureСhangedProducer {
+      + {abstract}  send(TemperatureСhanged) error
+    }
+
+    class TemperatureСhangedProducerImp implements TemperatureСhangedProducer {
+      + {abstract}  send(TemperatureСhanged) error
+    }
+    
+    interface TelemetryRepository {
+      + {abstract}  set(TelemetryEntity) error
+      + {abstract}  get(uuid: UUID) (TelemetryEntity, error)
+    }
+
+    class TelemetryRepositoryImp implements TelemetryRepository {
+        + set(telemetry_entity: TelemetryEntity) error
+        + get(uuid: UUID) (TelemetryEntity, error)
+    }
+
+    interface TelemetryService {
+        + {abstract} start()
+        + {abstract} stop()
+    }
+    
+    class TelemetryServiceImp implements TelemetryService {
+        - consumer : TelemetryConsumer
+        - producer : TemperatureСhangedProducer
+        - repos : TelemetryRepository
+        + start()
+        + stop()
+        + set(telemetry_entity: TelemetryEntity) error
+        + get(uuid: UUID) (TelemetryEntity, error)
+    }
+
+    struct TelemetryEntity {
+        uuid : UUID
+        device_uuid : UUID
+        data : string
+    }
+
+    struct TelemetryDTO {
+        uuid : UUID
+        device_uuid : UUID
+        data : string
+    }
+
+    struct TemperatureСhanged {
+        uuid : UUID
+        device_uuid : UUID
+        data : string
+    }
+    
+    TelemetryServiceImp::set <.. TelemetryEntity
+    TelemetryServiceImp::get <.. TelemetryEntity
+    TelemetryRepository::set <.. TelemetryEntity
+    TelemetryRepository::get <.. TelemetryEntity
+    TelemetryConsumer::sub <.. TelemetryEntity
+    TemperatureСhangedProducer::Send <.. TelemetryEntity
+}
+
+@enduml

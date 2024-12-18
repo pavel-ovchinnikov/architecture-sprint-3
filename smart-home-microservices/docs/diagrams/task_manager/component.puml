@@ -1,0 +1,32 @@
+﻿@startuml
+
+!include <C4/C4_Component>
+
+title Component diagram for Task manager
+
+Container_Boundary(task, "Task manager") {
+    Component(task_controller, "Task Controller")
+    Component(task_service, "Task Service")
+    Component(task_dto, "Task DTO")
+    Component(task_entity, "Task Entity")
+    Component(task_repository, "Task Repository")
+
+    Rel(task_controller, task_service, "")
+    Rel(task_service, task_repository, "")
+    Rel(task_controller, task_dto, "")
+    Rel_U(task_service, task_dto, "")
+    Rel(task_service, task_entity, "")
+    Rel_U(task_repository, task_entity, "")
+}
+
+Container(api_gateway, "API Gateway")
+ContainerDb(task_db, "Dask Database")
+System(logging_monitoring, "ELK")
+ContainerQueue(kafka, "Kafka")
+
+Rel_R(task_repository, task_db, "Stores data in", "JDBC")
+Rel_D(api_gateway, task_controller, "Manage task", "REST")
+Rel_L(logging_monitoring, task_controller, "Get logs/metrics", "REST")
+Rel_L(task_service, kafka, "")
+
+@enduml

@@ -1,0 +1,39 @@
+﻿@startuml
+
+!include <C4/C4_Component>
+
+title Component diagram for FM manager
+
+
+Container_Boundary(fault_manager, "Fault manager") {
+    Component(alarm_service, "Alarm Service")
+    Component(alarm_controller, "Alarm Controller")
+    Component(alarm_consumer, "Alarms Consumer")
+    Component(notification_producer, "notification_producer")
+    Component(alarm_dto, "Alarms DTO")
+    Component(alarm_entity, "Alarms Entity")
+    Component(alarm_repository, "Alarms Repository")
+    
+    Rel(alarm_service, alarm_dto, "")
+    Rel(alarm_service, alarm_entity, "")
+    Rel(alarm_service, alarm_repository, "")
+    Rel_L(alarm_service, notification_producer, "")
+    Rel(alarm_controller, alarm_service, "")
+    Rel(alarm_consumer, alarm_service, "")
+    Rel(alarm_controller, alarm_dto, "")
+    Rel_U(alarm_repository, alarm_entity, "")
+}
+
+Container(api_gateway, "API Gateway")
+ContainerDb(alarms_db, "Alarms Database")
+System(logging_monitoring, "ELK")
+ContainerQueue(kafka, "Kafka")
+
+
+Rel(logging_monitoring, alarm_service, "Get logs/metrics")
+Rel(notification_producer, kafka, "")
+Rel(kafka, alarm_consumer,"")
+Rel_D(alarm_repository, alarms_db, "")
+Rel_D(api_gateway, alarm_controller, "")
+
+@enduml
