@@ -1,0 +1,35 @@
+@startuml
+
+!include <C4/C4_Component>
+
+title Component diagram for Manage  service
+
+Container_Boundary(telemetry, "Telemetry microservice") {
+    Component(telemetry_service, "TelemetryService")
+    Component(telemetry_repository, "TelemetryRepository")
+    Component(telemetry_consumer, "TelemetryConsumer")
+    Component(temperature_changed_producer, "TemperatureСhangedProducer")
+    Component(TelemetryDTO, "TelemetryDTO")
+    Component(TemperatureСhanged, "TemperatureСhanged")
+    Component(TelemetryEntity, "TelemetryEntity")
+
+    Rel_U(telemetry_consumer, telemetry_service, "")
+    Rel_U(temperature_changed_producer, telemetry_service, "")
+    Rel_D(telemetry_repository, telemetry_service, "")
+    Rel(TelemetryEntity, telemetry_consumer, "")
+    Rel(TemperatureСhanged, temperature_changed_producer, "")
+    Rel(TelemetryDTO, telemetry_repository, "")
+}
+
+ContainerDb(telemetry_db, "Telemetry Database", "PostgreSQL", "Stores devices telemetry", $tags = "storage")
+Container(api_gateway, "API Gateway")
+Container(logging_monitoring, "ELK", "Store services logs and metrics.")
+ContainerQueue(kafka, "Kafka")
+
+Rel_R(temperature_changed_producer,kafka, "")
+Rel_R(kafka, telemetry_consumer, "")
+Rel_U(telemetry_repository, telemetry_db, "")
+Rel_R(logging_monitoring, telemetry_service, "")
+Rel_D(api_gateway, telemetry_service, "")
+
+@enduml
