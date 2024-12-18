@@ -1,0 +1,80 @@
+@startuml
+!include <C4/C4_Container>
+
+title SmartHome Container Diagram
+
+Person_Ext(user, "User")
+System_Ext(smart_device, "Sensor/Device")
+
+System_Boundary(s1, "System SmartHome") {
+    Container(proxy, "Proxy <NGINX>")
+    Container(api_gateway, "API Gateway")
+    Container('webui_service', "WEB-UI service")
+    ContainerQueue(kafka, "Kafka")
+    Container(notification_server, "Notification server")
+
+    Boundary(monitoring_system, "Monitoring system") {
+        Container('grafana', "Grafana")
+        Container('prometheus', "Prometheus")
+        Container(all_services, "all services")
+        Container(ELK, "Store services logs metrict")
+    }
+
+    Boundary(personal_data_system, "Personal data system") {
+       Container('user_service', "User Service")
+       ContainerDb(user_db, "PostgreSQL")
+    }
+
+    Boundary(devices_system, "Devices system") {
+        Container('fault_manager', "Fault Manager") 
+        Container('device_gateway', "Device Gateway")
+        Container('device_service', "Device Service")
+        Container('telemetry_service', "Telemetry Service")
+        Container('task_manager', "Task Manager")
+        ContainerDb(fault_manager_db, "PostgreSQL")
+        ContainerDb(devices_db, "PostgreSQL")
+        ContainerDb(task_manager_db, "PostgreSQL")
+        ContainerDb(telemetry_service_db, "PostgreSQL")
+    }
+    
+}
+
+Rel_D(user, proxy, "")
+Rel_L(device_gateway, smart_device, "")
+
+' proxy
+Rel(proxy, api_gateway, " request")
+Rel(proxy, webui_service, "")
+Rel(proxy, grafana, "")
+Rel(proxy, notification_server, "")
+
+' monitoring
+Rel_U(all_services, prometheus, "metrics")
+Rel_U(all_services, ELK, "logs")
+Rel_U(prometheus, grafana, "")
+
+' api_gateway
+Rel(api_gateway, device_service, "grpc request")
+Rel(api_gateway, device_gateway, "grpc request")
+Rel(api_gateway, telemetry_service, "grpc request")
+Rel(api_gateway, task_manager, "grpc request")
+Rel(api_gateway, fault_manager, "grpc request")
+Rel(api_gateway, user_service, "grpc request")
+
+' Devices system
+Rel_D(user_service, user_db, "read/write")
+Rel_D(device_service, devices_db, "read/write")
+Rel_D(task_manager, task_manager_db, "read/write")
+Rel_D(telemetry_service, telemetry_service_db, "read/write")
+Rel_D(fault_manager, fault_manager_db, "read/write")
+
+' MB
+Rel(device_service, kafka, "")
+Rel(device_gateway, kafka, "")
+Rel(telemetry_service, kafka, "")
+Rel(task_manager, kafka, "")
+Rel(fault_manager, kafka, "")
+Rel(user_service, kafka, "")
+Rel(notification_server, kafka, "")
+
+@enduml
