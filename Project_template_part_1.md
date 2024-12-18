@@ -65,7 +65,7 @@
 
 **Диаграмма кода (Code)**
 
-![Containers](./smart-home-microservices/docs/diagrams/telemetry/code.png
+![Containers](./smart-home-microservices/docs/diagrams/telemetry/code.png)
 
 # Задание 3. Разработка ER-диаграммы
 
