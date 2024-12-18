@@ -57,7 +57,7 @@
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+![Containers](./smart-home-microservices/docs/images/context.png)
 
 **Диаграмма компонентов (Components)**
 
